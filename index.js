@@ -12,20 +12,20 @@ const config = {
 const app = express();
 
 app.get('/', (req, res) => res.send('Hello LINE BOT!(GET)')); //ブラウザ確認用(無くても問題ない)
-app.post('/webhook', line.middleware(config), (req, res) => {
-    console.log(req.body.events);
+app.post('/webhook', line.middleware(config), async (req, res) => {
+    try {
+        console.log(req.body.events);
 
-    //ここのif分はdeveloper consoleの"接続確認"用なので削除して問題ないです。
-    if(req.body.events[0].replyToken === '00000000000000000000000000000000' && req.body.events[1].replyToken === 'ffffffffffffffffffffffffffffffff'){
-        res.send('Hello LINE BOT!(POST)');
-        console.log('疎通確認用');
-        return; 
+        // ... (remove the "if" block as you mentioned it's for testing purposes)
+
+        const results = await Promise.all(req.body.events.map(handleEvent));
+        res.json(results);
+    } catch (error) {
+        console.error('Error processing webhook:', error);
+        res.status(500).end();
     }
-
-    Promise
-      .all(req.body.events.map(handleEvent))
-      .then((result) => res.json(result));
 });
+
 
 const client = new line.Client(config);
 
